@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mein Brain</title>
+<style>
+/* Second Brain · Ecomone Academy. Gestaltung nach dem Ecomone Firmen-Brain (Julia). Daten unten in #brain-daten. */
+:root{
+  --f-display:-apple-system,BlinkMacSystemFont,"SF Pro Display",Inter,system-ui,sans-serif;
+  --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,system-ui,"Segoe UI",sans-serif;
+  --bg:#0b0a10;--fg:#f3f1fa;--muted:#9a96ad;--faint:#6d6980;
+  --glass:rgba(255,255,255,.06);--edge:rgba(255,255,255,.12);
+  --blur:blur(30px) saturate(1.7);--gshadow:inset 0 1px 0 rgba(255,255,255,.14),0 24px 60px rgba(0,0,0,.35);
+  --sel-bg:rgba(24,22,34,.72);--hover:rgba(255,255,255,.1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg)}
+body{font-family:var(--f-body);-webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:radial-gradient(700px 520px at 8% 8%,rgba(139,92,246,.30),transparent 65%),radial-gradient(640px 480px at 92% 14%,rgba(236,72,153,.18),transparent 65%),radial-gradient(700px 520px at 16% 80%,rgba(59,130,246,.18),transparent 65%),radial-gradient(640px 520px at 84% 84%,rgba(16,185,129,.14),transparent 65%);background-attachment:fixed}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid #a78bfa;outline-offset:3px}
+.gut{padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px))}
+
+/* Kopf */
+.hd{padding-block:48px 8px}
+.hd-in{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px 32px}
+.eyebrow{font:600 12px/1 var(--f-body);letter-spacing:.02em;color:var(--muted)}
+.hd h1{font:700 clamp(34px,5vw,56px)/1.02 var(--f-display);letter-spacing:-.035em;margin:12px 0 12px;text-wrap:balance}
+.hd .sub{margin:0;color:var(--muted);font-size:15px;line-height:1.55;max-width:58ch}
+.pill{display:flex;align-items:center;gap:10px;font:500 12.5px var(--f-body);color:var(--muted);border:1px solid var(--edge);background:var(--glass);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);padding:8px 14px;border-radius:999px}
+.pill i{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.18)}
+
+/* Raster */
+.stage{padding-block:24px 40px}
+.grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,280px);gap:24px}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+.center{position:relative;min-width:0}
+canvas{display:block;width:100%;height:clamp(520px,78vh,980px);touch-action:none;cursor:grab}
+canvas.drag{cursor:grabbing}canvas.hot{cursor:pointer}
+
+/* Glas-Karten */
+.panel{position:relative;border-radius:24px;padding:22px 22px 18px;background:var(--glass);border:1px solid var(--edge);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);box-shadow:var(--gshadow)}
+.panel h3{font:600 15px/1.2 var(--f-display);letter-spacing:-.01em;margin:0 0 14px;display:flex;justify-content:space-between;gap:10px}
+.panel h3 span{font:400 13px var(--f-body);color:var(--muted)}
+.panel.note p{margin:0 0 10px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+.panel.note p:last-child{margin:0}
+.panel.note b{color:var(--fg);font-weight:500}
+.search{width:100%;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--edge);color:var(--fg);font:400 14px var(--f-body);padding:11px 14px;outline:none}
+.search:focus{border-color:rgba(167,139,250,.7);box-shadow:0 0 0 4px rgba(167,139,250,.16)}
+.search::placeholder{color:var(--faint)}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 10px;align-items:start;padding:11px 0;border-top:1px solid rgba(255,255,255,.07);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
+.row:first-child{border-top:0;padding-top:2px}
+.row:hover .rt{color:#fff}
+.chip{font:600 10px/1 var(--f-body);letter-spacing:.04em;text-transform:uppercase;padding:4px 7px;border-radius:6px;margin-top:1px}
+.dot{width:8px;height:8px;border-radius:50%;margin-top:5px}
+.rt{font:500 13.5px/1.35 var(--f-body);color:#e6e3f0}
+.rs{grid-column:2;font:400 12px var(--f-body);color:var(--muted)}
+.empty{font-size:13px;color:var(--muted);line-height:1.5}
+.area{padding:12px 0;border-top:1px solid rgba(255,255,255,.07);cursor:pointer}
+.area:first-child{border-top:0;padding-top:2px}
+.area .t{display:flex;justify-content:space-between;font:500 14px var(--f-body)}
+.area .t b{font:600 14px var(--f-display);font-variant-numeric:tabular-nums}
+.area .s{display:flex;height:5px;border-radius:3px;overflow:hidden;margin-top:8px;background:rgba(255,255,255,.06)}
+.area .s i{display:block;height:100%}
+.area .k{font:400 12px var(--f-body);color:var(--muted);margin-top:6px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:620px;margin:4px auto 0}
+.kpis .panel{padding:10px 14px;border-radius:14px;box-shadow:none}
+.kpis .big{font:600 20px/1 var(--f-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpis .lab{font:400 11.5px var(--f-body);color:var(--muted);margin-top:4px}
+.gauge{height:2px;border-radius:2px;margin-top:8px;background:rgba(255,255,255,.08);overflow:hidden}
+.gauge i{display:block;height:100%;background:rgba(255,255,255,.55)}
+
+/* Bedienung */
+.ctl{position:absolute;z-index:3;right:0;top:0;display:flex;gap:4px;padding:5px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid var(--edge);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+.ctl button{width:32px;height:32px;border:0;border-radius:10px;background:transparent;cursor:pointer;font:500 16px var(--f-body);display:grid;place-items:center}
+.ctl button:hover{background:var(--hover)}
+.ctl .z{font:500 12px var(--f-body);color:var(--muted);align-self:center;padding:0 6px 0 2px;min-width:44px;text-align:right}
+.sel{position:absolute;z-index:4;left:0;top:0;width:min(330px,calc(100% - 32px));max-height:min(66%,460px);overflow:auto;border-radius:22px;padding:18px 20px;background:var(--sel-bg);border:1px solid var(--edge);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);box-shadow:var(--gshadow);font-size:13px;line-height:1.45}
+.sel[hidden]{display:none!important}
+.sel .x{float:right;border:0;background:transparent;opacity:.6;cursor:pointer;font:400 20px/1 var(--f-body);padding:0 0 0 8px}
+.sel .kind{font:500 12px var(--f-body);color:var(--muted)}
+.sel h4{margin:6px 0 10px;font:600 18px/1.25 var(--f-display);letter-spacing:-.015em}
+.sel .desc{color:#d9d5e6;margin:0 0 12px;font-size:13.5px}
+.sel .tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;border:1px solid var(--edge);background:rgba(255,255,255,.06);font:500 12px var(--f-body);cursor:pointer}
+.tag i{width:7px;height:7px;border-radius:50%}
+.btns{display:flex;gap:8px;margin-bottom:4px}
+.btn{flex:1;border:0;border-radius:12px;padding:10px 12px;background:#fff;color:#0b0a10;font:600 13px var(--f-body);cursor:pointer;text-align:center;text-decoration:none}
+.btn.ghost{background:rgba(255,255,255,.1);color:var(--fg)}
+.btn:hover{filter:brightness(.92)}
+.sel .rel-h{font:500 12px var(--f-body);color:var(--muted);margin:14px 0 6px}
+.sel ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.sel li button{width:100%;text-align:left;border:0;background:transparent;padding:8px 10px;border-radius:10px;cursor:pointer;display:flex;gap:8px;align-items:flex-start;font:400 13.5px/1.35 var(--f-body)}
+.sel li button:hover{background:var(--hover)}
+.sel li i{flex:none;width:7px;height:7px;border-radius:50%;margin-top:6px}
+.sel li small{display:block;font:400 12px var(--f-body);color:var(--muted);margin-top:3px}
+
+/* Leser */
+.reader{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(8,7,14,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px 16px}
+.reader[hidden]{display:none}
+.sheet{position:relative;width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:28px;padding:34px 40px 0;background:rgba(24,22,34,.86);border:1px solid var(--edge);backdrop-filter:blur(40px) saturate(1.8);-webkit-backdrop-filter:blur(40px) saturate(1.8);box-shadow:0 40px 120px rgba(0,0,0,.5)}
+.r-x{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.08);font:400 20px/1 var(--f-body);cursor:pointer}
+.r-kind{font:500 13px var(--f-body);color:var(--muted);padding-right:40px}
+.reader h2{font:700 clamp(24px,3vw,32px)/1.15 var(--f-display);letter-spacing:-.025em;margin:8px 0 6px;padding-right:40px}
+.r-body{overflow-y:auto;padding-bottom:36px;margin-right:-16px;padding-right:16px}
+.r-meta{font:400 12.5px var(--f-body);color:var(--faint);margin-bottom:18px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.r-meta a{color:#c4b5fd;text-decoration:none}
+.md{font:400 15px/1.65 var(--f-body);color:#dedbe8}
+.md h2,.md h3,.md h4{font-family:var(--f-display);color:#fff;letter-spacing:-.015em;margin:28px 0 8px;line-height:1.25}
+.md h2{font-size:21px}.md h3{font-size:17px}.md h4{font-size:15px}
+.md p{margin:0 0 12px}.md ul,.md ol{margin:0 0 14px;padding-left:22px}.md li{margin:4px 0}
+.md b{color:#fff;font-weight:600}
+.md code{font:500 13px ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:6px}
+.md blockquote{margin:0 0 14px;padding:10px 16px;border-left:2px solid rgba(255,255,255,.3);color:var(--muted)}
+.md hr{border:0;border-top:1px solid rgba(255,255,255,.1);margin:22px 0}
+.md a{color:#c4b5fd}
+.md .wl{all:unset;cursor:pointer;color:#c4b5fd;border-bottom:1px solid rgba(196,181,253,.35)}
+.md .wl:hover{color:#fff}.md .wl.miss{color:var(--muted);border-bottom-style:dashed;cursor:default}
+.md .tw{overflow-x:auto;margin:0 0 16px;border:1px solid rgba(255,255,255,.1);border-radius:14px}
+.md table{border-collapse:collapse;width:100%;font-size:13.5px}
+.md th,.md td{text-align:left;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.07);vertical-align:top}
+.md th{color:#fff;font-weight:600;background:rgba(255,255,255,.04)}
+.fuss{margin:0 0 48px;font:400 13px/1.6 var(--f-body);color:var(--faint)}
+.fuss summary{cursor:pointer;color:var(--muted);font-weight:500}
+.fuss p{margin:12px 0 0;max-width:80ch}
+.brand{float:right;font-size:12px;color:var(--faint)}
+
+@media (max-width:1080px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.center{grid-column:1/-1;order:-1}canvas{height:clamp(420px,70vh,760px)}}
+@media (max-width:640px){
+  .gut{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .grid{grid-template-columns:minmax(0,1fr);gap:20px}.hd{padding-block:28px 4px}
+  canvas{height:clamp(360px,62vh,560px)}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .sheet{padding:26px 22px 0;border-radius:22px}
+  .sel{max-height:56%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="hd gut">
+  <div class="hd-in">
+    <div>
+      <div class="eyebrow" id="eyebrow">Second Brain</div>
+      <h1 id="h1">Was mein Brain weiss</h1>
+      <p class="sub" id="sub">Jeder Lichtpunkt ist eine Notiz, jede Linie eine Verknüpfung. Ziehen zum Drehen, scrollen zum Zoomen, einen Punkt antippen für seine Verknüpfungen.</p>
+    </div>
+    <div class="pill"><i></i><span id="stand">Stand</span></div>
+  </div>
+</header>
+
+<main class="stage gut">
+  <div class="grid">
+    <aside class="col">
+      <div class="panel"><h3>Suchen <span id="cnt"></span></h3><input id="q" class="search" type="search" placeholder="Shop, Ads, Ziele …" autocomplete="off" aria-label="Notizen suchen"></div>
+      <div class="panel"><h3>Als Nächstes <span id="todo-n"></span></h3><div id="todo"></div></div>
+      <div class="panel"><h3>Zuletzt gewachsen</h3><div id="recent"></div></div>
+    </aside>
+    <div class="center">
+      <canvas id="cv" aria-label="Gehirn aus Lichtpunkten, Regionen nach Bereich eingefärbt"></canvas>
+      <div class="ctl" id="ctl"></div>
+      <div class="sel" id="sel" hidden></div>
+      <div class="kpis" id="kpis"></div>
+    </div>
+    <aside class="col">
+      <div class="panel"><h3>Bereiche</h3><div id="areas"></div></div>
+      <div class="panel note"><h3>So wächst es</h3>
+        <p>Sag Claude einfach <b>«Merk dir …»</b>, gib ihm einen Link mit <b>«Arbeite das ins Brain ein»</b> oder frag <b>«Was weiss mein Brain über …?»</b>.</p>
+        <p>Mit <b>«zeig mein Brain»</b> wird dieses Bild neu gezeichnet.</p></div>
+    </aside>
+  </div>
+</main>
+
+<div class="reader" id="reader" hidden role="dialog" aria-modal="true" aria-labelledby="r-title">
+  <div class="sheet">
+    <button class="r-x" type="button" data-rclose aria-label="Schliessen">×</button>
+    <div class="r-kind" id="r-kind"></div>
+    <h2 id="r-title"></h2>
+    <div class="r-body" id="r-body"></div>
+  </div>
+</div>
+
+<details class="fuss gut"><summary>So ist das Bild gebaut</summary><p>Jeder helle Punkt ist eine Notiz aus deinem Obsidian-Brain, die Farbe zeigt ihren Bereich. Die Linien sind deine [[Verknüpfungen]] zwischen Notizen. Die feinen Punkte im Hintergrund formen nur das Gehirn; je mehr Notizen ein Bereich hat, desto heller leuchtet seine Region. Das Bild ist eine Momentaufnahme: Claude baut es aus deinen Dateien neu, sobald du «zeig mein Brain» sagst. <span class="brand">Second Brain · Ecomone Academy</span></p></details>
+
+<script id="brain-daten" type="application/json">__BRAIN_DATEN__</script>
+<script>
+/* ===================== DATEN ===================== */
+let DATA;
+try{DATA=JSON.parse(document.getElementById("brain-daten").textContent)}catch(e){DATA=null}
+if(!DATA||!Array.isArray(DATA.notizen))DATA={vorname:"",vault:"",stand:"",ss:true,notizen:[]};
+const SS=DATA.ss!==false;const sz=s=>SS?s:s.replace(/weiss/g,"weiß").replace(/Schliessen/g,"Schließen");
+
+const B=[ // Schlüssel, Name, Farbe, Region im Gehirn (x,y), Gewicht (die drei Lebensbereiche sind die grössten Regionen)
+ ["privat","Privat","#ff6fb5",[-.8,-.3],1.7],
+ ["business","Business","#4d7cff",[.1,-.62],1.7],
+ ["shops","Shops","#29e2a2",[.78,-.12],1.7],
+ ["ich","Ich","#8b7cff",[-.25,-.05],1],
+ ["projekte","Projekte","#9ecbff",[.42,.28],1],
+ ["aufgaben","Aufgaben","#ffb23f",[.12,.42],1],
+ ["personen","Personen","#ff9f80",[-.32,.35],1],
+ ["themen","Themen","#45e0f2",[-.98,.3],1],
+ ["entscheidungen","Entscheide","#ff5c5c",[.32,-.12],1],
+ ["synthesen","Synthesen","#f2f4fb",[-.62,.45],1],
+ ["quellen","Quellen","#8b90a3",[-.05,.6],1],
+ ["tagebuch","Tagebuch","#c9a7ff",[.3,.58],1],
+ ["eingang","Eingang","#a3a3b8",[-.6,.05],.8]];
+const BL={},BC={},REG={},BW={};B.forEach(([k,l,c,r,wt])=>{BL[k]=l;BC[k]=c;REG[k]=r;BW[k]=wt});
+const NAME2KEY={"Ich":"ich","Privat":"privat","Business":"business","Shops":"shops","Shop":"shops","shop":"shops","Projekte":"projekte","Aufgaben":"aufgaben","Personen":"personen","Themen":"themen","Entscheidungen":"entscheidungen","Synthesen":"synthesen","Quellen":"quellen","Tagebuch":"tagebuch","Eingang":"eingang"};
+
+const NOTES=DATA.notizen.map((n,i)=>{let b=String(n.bereich||"themen");b=NAME2KEY[b]||b.toLowerCase();if(!BL[b])b="themen";
+  return{i,t:String(n.titel||"Ohne Titel"),pfad:String(n.pfad||""),b,shop:b==="shops"?String(n.shop||"Shop"):"",typ:n.typ||"",st:n.status||"",d:n.beschreibung||"",u:n.aktualisiert||"",prio:n.prio||"",f:n.faellig||"",zu:n.zustaendig||"",c:n.inhalt||"",links:Array.isArray(n.links)?n.links:[],rel:new Set()}});
+NOTES.forEach(n=>n.links.forEach(j=>{if(NOTES[j]&&j!==n.i){n.rel.add(j);NOTES[j].rel.add(n.i)}}));
+const BT={};B.forEach(([k])=>BT[k]={n:0,st:{},lk:0,last:""});
+NOTES.forEach(n=>{const t=BT[n.b];t.n++;t.st[n.st||"?"]=(t.st[n.st||"?"]||0)+1;if(n.rel.size)t.lk++;if(n.u>t.last)t.last=n.u});
+let EDGES=0;NOTES.forEach(n=>n.rel.forEach(j=>{if(j>n.i)EDGES++}));
+const SHOPS=[...new Set(NOTES.filter(n=>n.b==="shops").map(n=>n.shop))].sort((a,b)=>a.localeCompare(b));
+const SHPAL=["#29e2a2","#8ff5cf","#12b386","#b8f04a","#4ee6c9","#6fd17a"];const SHC={};SHOPS.forEach((s,i)=>SHC[s]=SHPAL[i%SHPAL.length]);
+const col=n=>n.b==="shops"?(SHC[n.shop]||BC.shops):BC[n.b];
+const lab=n=>n.b==="shops"?"Shop · "+n.shop:BL[n.b];
+const ST={};SHOPS.forEach(s=>{const l=NOTES.filter(n=>n.b==="shops"&&n.shop===s);ST[s]={n:l.length,lk:l.filter(n=>n.rel.size).length,last:l.reduce((m,n)=>n.u>m?n.u:m,"")}});
+const OPEN=NOTES.filter(n=>n.b==="aufgaben"&&!/erledigt|veraltet/.test(n.st));
+const WIKI=NOTES.filter(n=>!["quellen","tagebuch","eingang"].includes(n.b));
+
+/* ===================== HILFEN ===================== */
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const rng=s=>()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296};
+const rgb=h=>{const n=parseInt(h.slice(1),16);return[n>>16,n>>8&255,n&255]};
+const rgba=(h,a)=>{const[r,g,b]=rgb(h);return`rgba(${r},${g},${b},${Math.max(0,Math.min(1,a))})`};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const norm=t=>String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"");
+const dt=s=>{const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[3]}.${m[2]}.${m[1]}`:String(s)};
+const obs=n=>DATA.vault?`obsidian://open?vault=${encodeURIComponent(DATA.vault)}&file=${encodeURIComponent(n.pfad.replace(/\.md$/,""))}`:"";
+function fit(c){const r=c.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);const W=Math.max(1,Math.round(r.width*d)),H=Math.max(1,Math.round(r.height*d));if(c.width!==W||c.height!==H){c.width=W;c.height=H}const x=c.getContext("2d");x.setTransform(d,0,0,d,0,0);return[x,r.width,r.height]}
+const PRIO={hoch:["#fb7185","rgba(251,113,133,.16)"],mittel:["#fbbf24","rgba(251,191,36,.14)"],tief:["#94a3b8","rgba(148,163,184,.14)"]};
+const PR={hoch:0,mittel:1,tief:2};
+
+/* ===================== KOPF & PANELS ===================== */
+document.title=DATA.vorname?DATA.vorname+(/[sxzß]$/i.test(DATA.vorname)?"’":"s")+" Brain":"Mein Brain";
+document.getElementById("eyebrow").textContent=(DATA.vorname?DATA.vorname+" · ":"")+"Second Brain";
+document.getElementById("h1").textContent=sz("Was mein Brain weiss");
+document.querySelector("[data-rclose]").setAttribute("aria-label",sz("Schliessen"));
+if(WIKI.length<15)document.getElementById("sub").textContent+=" Dein Brain wächst mit jeder Notiz.";
+document.getElementById("stand").textContent="Stand "+(DATA.stand||"–");
+document.getElementById("cnt").textContent=NOTES.length+" Notizen";
+
+function row(n,lead,sub){return`<button class="row" data-n="${n.i}">${lead}<span class="rt">${esc(n.t)}</span>${sub?`<span class="rs">${esc(sub)}</span>`:""}</button>`}
+const todos=[...OPEN].sort((a,b)=>(PR[a.prio]??3)-(PR[b.prio]??3)||String(a.f||"9").localeCompare(String(b.f||"9")));
+document.getElementById("todo-n").textContent=OPEN.length?OPEN.length+" offen":"";
+document.getElementById("todo").innerHTML=todos.length?todos.slice(0,5).map(n=>{const p=PRIO[n.prio]||PRIO.tief;return row(n,`<span class="chip" style="color:${p[0]};background:${p[1]}">${esc(n.prio||"–")}</span>`,[n.f&&("fällig "+dt(n.f)),n.zu==="Claude"&&"für Claude"].filter(Boolean).join(" · "))}).join(""):`<div class="empty">Keine offenen Aufgaben. Sag «Neue Aufgabe: …», dann steht sie hier.</div>`;
+const recent=[...NOTES].filter(n=>n.u).sort((a,b)=>String(b.u).localeCompare(String(a.u))||a.t.localeCompare(b.t)).slice(0,5);
+document.getElementById("recent").innerHTML=recent.length?recent.map(n=>row(n,`<i class="dot" style="background:${col(n)}"></i>`,`${lab(n)} · ${dt(n.u)}`)).join(""):`<div class="empty">Noch nichts.</div>`;
+const areaRow=(attr,l,c,list,lk,last)=>{const st={};list.forEach(n=>st[n.st||"?"]=(st[n.st||"?"]||0)+1);
+  const parts=Object.entries(st).sort((a,b)=>b[1]-a[1]).map(([s,v])=>`<i style="flex:${v};background:${rgba(c,/erledigt|veraltet/.test(s)?.3:/offen/.test(s)?.65:1)}" title="${esc(s)}: ${v}"></i>`).join("");
+  return{n:list.length,h:`<div class="area" ${attr}><div class="t"><span>${esc(l)}</span><b>${list.length}</b></div><div class="s">${parts}</div><div class="k">${lk} verknüpft${last?" · zuletzt "+dt(last):""}</div></div>`}};
+const rowB=k=>{const[,l,c]=B.find(x=>x[0]===k);return areaRow(`data-b="${k}"`,l,c,NOTES.filter(n=>n.b===k),BT[k].lk,BT[k].last)};
+const ROWS=[...["privat","business"].filter(k=>BT[k].n).map(rowB),
+  ...SHOPS.map(s=>areaRow(`data-shop="${esc(s)}"`,"Shop · "+s,SHC[s],NOTES.filter(n=>n.b==="shops"&&n.shop===s),ST[s].lk,ST[s].last)),
+  ...B.filter(([k])=>!["privat","business","shops"].includes(k)&&BT[k].n).sort((a,b)=>BT[b[0]].n-BT[a[0]].n).map(([k])=>rowB(k))];
+document.getElementById("areas").innerHTML=ROWS.map(r=>r.h).join("")||`<div class="empty">Noch keine Notizen.</div>`;
+const KP=[[NOTES.length,"Notizen",1],[EDGES,"Verknüpfungen",Math.min(1,EDGES/Math.max(1,NOTES.length*1.5))],[OPEN.length,"offene Aufgaben",OPEN.length/Math.max(1,BT.aufgaben.n)],[BT.quellen.n,"Quellen",Math.min(1,BT.quellen.n/Math.max(1,NOTES.length*.3))]];
+document.getElementById("kpis").innerHTML=KP.map(([v,l,f],i)=>`<div class="panel"><div class="big" data-k="${i}">${RM?v:0}</div><div class="lab">${l}</div><div class="gauge"><i style="width:${f*100}%"></i></div></div>`).join("");
+document.addEventListener("click",e=>{const r=e.target.closest(".row[data-n]");if(r){select({kind:"note",i:+r.dataset.n});return}
+  const a=e.target.closest(".area[data-b]");if(a)select({kind:"bereich",k:a.dataset.b});
+  const sh=e.target.closest(".area[data-shop]");if(sh)select({kind:"shop",k:sh.dataset.shop})});
+
+/* ===================== AUSWAHL ===================== */
+let SEL=null;
+function W(n){if(!SEL)return 1;if(SEL.kind==="note"){if(n.i===SEL.i)return 3;if(NOTES[SEL.i].rel.has(n.i))return 2;return .1}
+  if(SEL.kind==="search")return SEL.hits.has(n.i)?2:.1;if(SEL.kind==="bereich")return n.b===SEL.k?2:.1;if(SEL.kind==="shop")return n.b==="shops"&&n.shop===SEL.k?2:.1;return 1}
+function select(s){SEL=s;renderSel();if(s&&s.kind==="note")focusOn(s.i);kick()}
+function renderSel(){
+  const el=document.getElementById("sel");el.hidden=true;el.innerHTML="";if(!SEL)return;
+  let h=`<button class="x" aria-label="Auswahl schliessen" data-act="close">×</button>`;
+  const item=n=>`<li><button data-act="note" data-k="${n.i}"><i style="background:${col(n)}"></i><span>${esc(n.t)}<small>${esc(lab(n))}${n.u?" · "+dt(n.u):""}</small></span></button></li>`;
+  if(SEL.kind==="note"){const n=NOTES[SEL.i];const rel=[...n.rel].map(j=>NOTES[j]).sort((a,b)=>lab(a).localeCompare(lab(b))||a.t.localeCompare(b.t));
+    h+=`<div class="kind">${[lab(n),n.st,n.u&&("aktualisiert "+dt(n.u))].filter(Boolean).map(esc).join(" · ")}</div><h4>${esc(n.t)}</h4>`;
+    if(n.d)h+=`<p class="desc">${esc(n.d)}</p>`;
+    h+=`<div class="tags">${n.b==="shops"?`<button class="tag" data-act="shop" data-k="${esc(n.shop)}"><i style="background:${col(n)}"></i>${esc(lab(n))}</button>`:`<button class="tag" data-act="bereich" data-k="${n.b}"><i style="background:${BC[n.b]}"></i>${BL[n.b]}</button>`}${n.prio?`<span class="tag">Prio ${esc(n.prio)}</span>`:""}${n.f?`<span class="tag">fällig ${esc(dt(n.f))}</span>`:""}</div>`;
+    h+=`<div class="btns">${n.c?`<button class="btn" data-act="read" data-k="${n.i}">Notiz lesen</button>`:""}${obs(n)?`<a class="btn ghost" href="${obs(n)}">In Obsidian öffnen</a>`:""}</div>`;
+    h+=`<div class="rel-h">Verknüpft mit ${rel.length} ${rel.length===1?"Notiz":"Notizen"}</div>`+(rel.length?`<ul>${rel.slice(0,60).map(item).join("")}</ul>`:`<div style="opacity:.7;font-size:12.5px">Noch keine Verknüpfung.</div>`)}
+  else if(SEL.kind==="search"){const list=NOTES.filter(n=>SEL.hits.has(n.i));
+    h+=`<div class="kind">Suche</div><h4>«${esc(SEL.q)}»: ${list.length} Treffer</h4>`+(list.length?`<ul>${list.map(item).join("")}</ul>`:`<div style="opacity:.75;font-size:12.5px">Nichts gefunden. Versuch ein kürzeres Wort.</div>`)}
+  else if(SEL.kind==="bereich"){const t=BT[SEL.k];const list=NOTES.filter(n=>n.b===SEL.k).sort((a,b)=>String(b.u).localeCompare(String(a.u)));
+    h+=`<div class="kind">Bereich</div><h4>${BL[SEL.k]}: ${t.n} ${t.n===1?"Notiz":"Notizen"}</h4>${SEL.k==="shops"&&SHOPS.length>1?`<div class="tags">${SHOPS.map(s=>`<button class="tag" data-act="shop" data-k="${esc(s)}"><i style="background:${SHC[s]}"></i>${esc(s)} ${ST[s].n}</button>`).join("")}</div>`:""}<div class="rel-h">${t.lk} davon verknüpft</div><ul>${list.map(item).join("")}</ul>`}
+  else if(SEL.kind==="shop"){const list=NOTES.filter(n=>n.b==="shops"&&n.shop===SEL.k).sort((a,b)=>String(b.u).localeCompare(String(a.u)));
+    h+=`<div class="kind">Shop</div><h4>${esc(SEL.k)}: ${list.length} ${list.length===1?"Notiz":"Notizen"}</h4><div class="rel-h">${(ST[SEL.k]||{lk:0}).lk} davon verknüpft</div><ul>${list.map(item).join("")}</ul>`}
+  el.innerHTML=h;el.hidden=false;el.scrollTop=0}
+document.getElementById("sel").addEventListener("click",e=>{const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+  if(a==="close")select(null);else if(a==="read")openReader(NOTES[+b.dataset.k]);else if(a==="note")select({kind:"note",i:+b.dataset.k});else if(a==="bereich")select({kind:"bereich",k:b.dataset.k});else if(a==="shop")select({kind:"shop",k:b.dataset.k})});
+addEventListener("keydown",e=>{if(e.key==="Escape"){if(!reader.hidden)closeReader();else select(null)}});
+
+/* ===================== KAMERA ===================== */
+const cv=document.getElementById("cv");
+const cam={yaw:-.35,pitch:0,zoom:1,px:0,py:0,vy:0,cx:0,cy:0,ptrs:new Map(),last:-1e9,moved:0,pinch:null,goal:null};
+const PMIN=-.9,PMAX=.9,ZMIN=.6,ZMAX=6;
+function zoomAt(mx,my,f){const z2=clamp(cam.zoom*f,ZMIN,ZMAX),k=z2/cam.zoom;cam.px=(mx-cam.cx)-((mx-cam.cx)-cam.px)*k;cam.py=(my-cam.cy)-((my-cam.cy)-cam.py)*k;cam.zoom=z2;kick()}
+function reset(){Object.assign(cam,{zoom:1,px:0,py:0,yaw:-.35,pitch:0,vy:0,goal:null});kick()}
+cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);cam.ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});cam.moved=0;cam.pan=e.shiftKey||e.button===2;cam.last=performance.now();cam.vy=0;cam.goal=null;
+  if(cam.ptrs.size===2){const[a,b]=[...cam.ptrs.values()];cam.pinch={d:Math.hypot(a.x-b.x,a.y-b.y),m:[(a.x+b.x)/2,(a.y+b.y)/2]}}cv.classList.add("drag");kick()});
+cv.addEventListener("pointermove",e=>{const r=cv.getBoundingClientRect();const pr=cam.ptrs.get(e.pointerId);
+  if(!pr){hover(e.clientX-r.left,e.clientY-r.top);return}
+  const dx=e.clientX-pr.x,dy=e.clientY-pr.y;pr.x=e.clientX;pr.y=e.clientY;cam.moved+=Math.abs(dx)+Math.abs(dy);cam.last=performance.now();
+  if(cam.ptrs.size>=2){const[a,b]=[...cam.ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y),m=[(a.x+b.x)/2,(a.y+b.y)/2];
+    if(cam.pinch){zoomAt(m[0]-r.left,m[1]-r.top,d/cam.pinch.d);cam.px+=m[0]-cam.pinch.m[0];cam.py+=m[1]-cam.pinch.m[1]}cam.pinch={d,m};return}
+  if(cam.pan){cam.px+=dx;cam.py+=dy}else{cam.yaw+=dx*.006;cam.vy=dx*.0006;cam.pitch=clamp(cam.pitch+dy*.005,PMIN,PMAX)}kick()});
+const up=e=>{const r=cv.getBoundingClientRect();const was=cam.ptrs.has(e.pointerId);cam.ptrs.delete(e.pointerId);if(cam.ptrs.size<2)cam.pinch=null;
+  if(was&&!cam.ptrs.size&&cam.moved<6&&e.type==="pointerup")tap(e.clientX-r.left,e.clientY-r.top);if(!cam.ptrs.size)cv.classList.remove("drag")};
+cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+cv.addEventListener("pointerleave",()=>hover(-1,-1));
+cv.addEventListener("contextmenu",e=>e.preventDefault());
+cv.addEventListener("wheel",e=>{e.preventDefault();const r=cv.getBoundingClientRect();cam.last=performance.now();
+  if(e.ctrlKey||Math.abs(e.deltaY)>=Math.abs(e.deltaX))zoomAt(e.clientX-r.left,e.clientY-r.top,Math.exp(-e.deltaY*(e.ctrlKey?.01:.0018)));else{cam.px-=e.deltaX;kick()}},{passive:false});
+cv.addEventListener("dblclick",()=>reset());
+document.getElementById("ctl").innerHTML=`<button data-z="in" aria-label="Hineinzoomen">+</button><button data-z="out" aria-label="Herauszoomen">−</button><button data-z="reset" aria-label="Ansicht zurücksetzen">⟲</button><button data-z="full" aria-label="Vollbild">⛶</button><span class="z">100%</span>`;
+document.getElementById("ctl").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cam.last=performance.now();
+  if(b.dataset.z==="in")zoomAt(cam.cx,cam.cy,1.4);else if(b.dataset.z==="out")zoomAt(cam.cx,cam.cy,1/1.4);
+  else if(b.dataset.z==="full"){const t=document.querySelector(".center");if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else if(t.requestFullscreen)t.requestFullscreen().catch(()=>{})}
+  else{reset();select(null)}});
+const zl=document.querySelector("#ctl .z");
+
+/* ===================== GEHIRN ===================== */
+const DR=rng(31);
+function fold(x,y,z){return Math.sin(x*9.1+Math.sin(y*7.3)*1.6)*Math.cos(z*8.2+Math.sin(x*5.1)*1.3)+.5*Math.sin(y*13+z*6)}
+const DPTS=[];
+for(let i=0;i<5600;i++){const u=DR()*2-1,th=DR()*Math.PI*2,s=Math.sqrt(1-u*u);const dx=s*Math.cos(th),dy=u,dz=s*Math.sin(th);
+  const hem=dz>=0?1:-1;const f=fold(dx,dy,dz);if(Math.abs(f)<.18&&DR()<.75)continue;
+  const r=1+.045*f;let X=dx*1.32*r,Y=dy*.95*r,Z=dz*.62*r+hem*.06;if(Y>.55&&X<-.1)Y=.55+(Y-.55)*.4;if(Y>.45&&X>.55)continue;
+  let best="themen",bd=1e9;for(const[k,[rx,ry]]of Object.entries(REG)){const d=((X/1.32-rx)**2+(Y/.95-ry)**2)/(BW[k]*BW[k]);if(d<bd){bd=d;best=k}}
+  DPTS.push({x:X,y:Y-.1,z:Z,k:best,ph:DR()*7,s:DR()})}
+for(let i=0;i<900;i++){const u=DR()*2-1,th=DR()*Math.PI*2,s=Math.sqrt(1-u*u);DPTS.push({x:.62+s*Math.cos(th)*.42,y:.66+u*.24,z:s*Math.sin(th)*.5,k:"themen",ph:DR()*7,s:DR(),cb:1})}
+for(let i=0;i<260;i++){const a=DR()*Math.PI*2,yy=DR();DPTS.push({x:.25+Math.cos(a)*.13-yy*.08,y:.62+yy*.7,z:Math.sin(a)*.13,k:"themen",ph:DR()*7,s:DR(),cb:2})}
+const ALLP=DPTS.filter(p=>!p.cb&&Math.abs(p.z)>.25);
+const POOL={};B.forEach(([b])=>{const p=DPTS.filter(p=>p.k===b&&!p.cb&&Math.abs(p.z)>.25);POOL[b]=p.length?p:ALLP});
+// jeder Shop bekommt seine eigene kleine Wolke in der Shop-Region
+const SHPOOL={};(function(){const sp=DPTS.filter(p=>p.k==="shops"&&!p.cb);const[cx0,cy0]=REG.shops;const S=SHOPS.length;
+  const cen=SHOPS.map((s,i)=>S===1?[cx0,cy0]:[cx0+Math.cos(i/S*Math.PI*2)*.2,cy0+Math.sin(i/S*Math.PI*2)*.24]);
+  sp.forEach(p=>{let bi=0,bd=1e9;cen.forEach(([x0,y0],i)=>{const d=(p.x/1.32-x0)**2+((p.y+.1)/.95-y0)**2;if(d<bd){bd=d;bi=i}});p.sh=SHOPS[bi]});
+  SHOPS.forEach(s=>{const q=sp.filter(p=>p.sh===s&&Math.abs(p.z)>.25);SHPOOL[s]=q.length?q:POOL.shops})})();
+const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0};
+const DMAX=Math.max(1,...B.map(([k])=>BT[k].n));
+const used=new Set();
+const DN=NOTES.map(n=>{const pool=n.b==="shops"?SHPOOL[n.shop]:POOL[n.b];let h=hash(n.b+"|"+n.pfad+"|"+n.t),p=pool[h%pool.length],g=0;
+  while(used.has(p)&&g<40){h=Math.imul(h^0x9e3779b9,16777619)>>>0;p=pool[h%pool.length];g++}used.add(p);
+  return{n,x:p.x*1.05,y:(p.y+.1)*1.05-.1,z:p.z*1.08,ph:(h%700)/100}});
+function pickNearest(mx,my,rad){let best=null,bd=rad*rad;for(const q of DN){if(!q.front)continue;const d=(q.sx-mx)**2+(q.sy-my)**2;if(d<bd){bd=d;best=q}}return best}
+let DLAB=[];
+function tap(x,y){const q=pickNearest(x,y,14);if(q){select({kind:"note",i:q.n.i});return}
+  const L=DLAB.find(l=>Math.abs(l.sx-x)<80&&Math.abs(l.sy-y)<16);if(L){select({kind:"bereich",k:L.k});return}select(null)}
+let HOV=null;function hover(x,y){const q=x>=0?pickNearest(x,y,12):null;cv.classList.toggle("hot",!!q);if(q!==HOV){HOV=q;kick()}}
+function focusOn(i){const d=DN[i];if(!d||RM)return;const R=Math.hypot(d.x,d.z)||1;cam.goal={yaw:Math.atan2(-d.x,-d.z),pitch:clamp(-Math.atan(d.y/R)*.6,PMIN,PMAX)};cam.last=performance.now()}
+
+const T0=performance.now();const ease=k=>1-Math.pow(1-k,3);
+function draw(t){
+  const[x,w,h]=fit(cv);x.clearRect(0,0,w,h);
+  cam.cx=w*.5;cam.cy=h*.47;
+  if(!cam.ptrs.size){if(cam.goal){let dy=((cam.goal.yaw-cam.yaw+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;cam.yaw+=dy*.08;cam.pitch+=(cam.goal.pitch-cam.pitch)*.08;if(Math.abs(dy)<.002)cam.goal=null}
+    else if(!RM){cam.yaw+=cam.vy;cam.vy*=.94;if(performance.now()-cam.last>3500&&!SEL)cam.yaw+=.0012}}
+  const zt=Math.round(cam.zoom*100)+"%";if(zl.textContent!==zt)zl.textContent=zt;
+  const K=RM?1:ease(clamp((t-T0)/1600,0,1));
+  const SM=w<560;const Z=cam.zoom,cx=cam.cx+cam.px,cy=cam.cy+cam.py,S=Math.min(w*(SM?.34:.27),h*.33)*Z;
+  const cr=Math.cos(cam.yaw),sr=Math.sin(cam.yaw),ct=Math.cos(cam.pitch),st=Math.sin(cam.pitch);
+  const pr=(X,Y,Zz)=>{X*=K;Y*=K;Zz*=K;const x1=X*cr-Zz*sr,z1=X*sr+Zz*cr;const y1=Y*ct-z1*st,z2=Y*st+z1*ct;const f=3/(3+z2);return[cx+x1*S*f,cy+y1*S*f,z2]};
+  // Boden
+  x.save();x.strokeStyle="rgba(255,255,255,.045)";x.lineWidth=1;const gy=cy+S*1.45;
+  for(let i=-10;i<=10;i++){x.beginPath();x.moveTo(cx+i*S*.12,gy);x.lineTo(cx+i*S*.45,Math.max(h,gy+10));x.stroke()}
+  for(let j=0;j<6;j++){const yy=gy+(Math.max(h,gy+10)-gy)*(j/6)**1.6;x.beginPath();x.moveTo(0,yy);x.lineTo(w,yy);x.stroke()}x.restore();
+  x.strokeStyle="rgba(255,255,255,.12)";x.lineWidth=1;x.setLineDash([2,6]);x.beginPath();x.ellipse(cx,gy-4,S*1.5,S*.16,0,0,7);x.stroke();x.setLineDash([]);
+  x.strokeStyle="rgba(167,139,250,.35)";x.beginPath();x.ellipse(cx,gy-4,S*1.15,S*.11,0,0,7);x.stroke();
+  x.globalCompositeOperation="lighter";
+  const scan=RM?-2:((t/2600)%2.6)-1.3;const selB=SEL&&SEL.kind==="bereich"?SEL.k:SEL&&SEL.kind==="shop"?"shops":SEL&&SEL.kind==="note"?NOTES[SEL.i].b:null;
+  const ps=Math.max(1,Math.sqrt(Z));
+  // Gehirn-Staub
+  for(const p of DPTS){const[px,py,pz]=pr(p.x,p.y,p.z);if(px<-5||py<-5||px>w+5||py>h+5)continue;const n=BT[p.k].n;let lum=.18+.82*Math.sqrt(n/DMAX);if(selB)lum*=p.k===selB?1.4:.25;if(SEL&&SEL.kind==="search")lum*=.35;
+    const depth=.45+.55*(1-(pz+1)/2);const tw=RM?1:.75+.25*Math.sin(t/800+p.ph);const near=Math.max(0,1-Math.abs(p.x-scan)*4);
+    const cc=p.cb?"#c4b5fd":p.sh?SHC[p.sh]:BC[p.k];const a=(p.cb?.25:lum)*depth*tw+near*.45;const r=(p.s>.96?1.9:1.15)*(1+near*.6)*ps;
+    x.fillStyle=rgba(cc,a);x.fillRect(px-r/2,py-r/2,r,r)}
+  // Regionen-Schimmer
+  B.forEach(([k,,c,[rx,ry]])=>{if(!BT[k].n)return;const[px,py]=pr(rx*1.32*.9,ry*.95*.9-.1,.62);const rr=S*(.12+.22*Math.sqrt(BT[k].n/DMAX));const on=!selB||selB===k;
+    const g=x.createRadialGradient(px,py,0,px,py,rr);g.addColorStop(0,rgba(c,on?.24:.06));g.addColorStop(1,rgba(c,0));x.fillStyle=g;x.beginPath();x.arc(px,py,rr,0,7);x.fill()});
+  for(const d of DN){const p=pr(d.x,d.y,d.z);d.sx=p[0];d.sy=p[1];d.zz=p[2];d.front=p[2]<.15}
+  // Verknüpfungen als Bögen
+  const arc=(a,b,al,col,lw)=>{const mx=(a.x+b.x)/2*1.35,my=(a.y+b.y)/2*1.35-.15,mz=(a.z+b.z)/2*1.35;const[qx,qy]=pr(mx,my,mz);x.strokeStyle=rgba(col,al);x.lineWidth=lw;x.beginPath();x.moveTo(a.sx,a.sy);x.quadraticCurveTo(qx,qy,b.sx,b.sy);x.stroke()};
+  const ea=K<1?0:1;
+  for(const a of DN){const n=a.n;for(const j of n.rel){if(j<n.i)continue;const b=DN[j];if(!b)continue;
+    if(!SEL)arc(a,b,(EDGES>400?.05:.1)*ea,col(n),.6);
+    else if(SEL.kind==="note"&&(n.i===SEL.i||j===SEL.i))arc(a,b,.85,"#ffffff",1.3);
+    else if((SEL.kind==="bereich"&&(n.b===SEL.k||NOTES[j].b===SEL.k))||(SEL.kind==="shop"&&(W(n)>1||W(NOTES[j])>1))||(SEL.kind==="search"&&SEL.hits.has(n.i)&&SEL.hits.has(j)))arc(a,b,.3,col(n),.8)}}
+  // Funken entlang einiger Linien
+  if(!RM&&!SEL&&K>=1){let c=0;for(const a of DN){for(const j of a.n.rel){if(j<a.n.i||(a.n.i*7+j)%5)continue;const b=DN[j];if(!b||++c>60)continue;
+    const k=((t/2400)+((a.n.i*13+j*7)%100)/100)%1;const mx=(a.x+b.x)/2*1.35,my=(a.y+b.y)/2*1.35-.15,mz=(a.z+b.z)/2*1.35;const[qx,qy]=pr(mx,my,mz);
+    const u=1-k,sx=u*u*a.sx+2*u*k*qx+k*k*b.sx,sy=u*u*a.sy+2*u*k*qy+k*k*b.sy;const g=x.createRadialGradient(sx,sy,0,sx,sy,5);g.addColorStop(0,rgba("#ffffff",.55*Math.sin(k*Math.PI)));g.addColorStop(1,"rgba(255,255,255,0)");x.fillStyle=g;x.beginPath();x.arc(sx,sy,5,0,7);x.fill()}}}
+  // Notizen
+  [...DN].sort((a,b)=>b.zz-a.zz).forEach(d=>{const wt=W(d.n),dim=Math.min(1,wt)*(d.front?1:.35);const tw=RM?1:.75+.25*Math.sin(t/500+d.ph);
+    const r=(2+Math.min(2.2,Math.sqrt(d.n.rel.size)*.55))*ps*(wt>2.5?1.8:wt>1.5?1.25:1)*(d===HOV?1.35:1);const c2=col(d.n);
+    const g=x.createRadialGradient(d.sx,d.sy,0,d.sx,d.sy,r*4.5);g.addColorStop(0,rgba(c2,.65*dim*tw));g.addColorStop(1,rgba(c2,0));x.fillStyle=g;x.beginPath();x.arc(d.sx,d.sy,r*4.5,0,7);x.fill();
+    x.fillStyle=`rgba(255,255,255,${.92*dim})`;x.beginPath();x.arc(d.sx,d.sy,r*.7,0,7);x.fill()});
+  x.globalCompositeOperation="source-over";
+  if(SEL&&SEL.kind==="note"){const d=DN[SEL.i];if(d){x.strokeStyle="#fff";x.lineWidth=1.3;x.beginPath();x.arc(d.sx,d.sy,10,0,7);x.stroke();if(!RM){const k=(t/1200)%1;x.strokeStyle=`rgba(196,181,253,${.7-k*.7})`;x.beginPath();x.arc(d.sx,d.sy,10+k*24,0,7);x.stroke()}}}
+  const font=(wg,s)=>`${wg} ${s}px -apple-system,BlinkMacSystemFont,'SF Pro Text',Inter,sans-serif`;
+  // Titel beim Zoomen und beim Darüberfahren
+  x.textAlign="left";
+  if(Z>1.8){x.font=font(400,12);DN.forEach(d=>{if(!d.front||d.sx<0||d.sy<0||d.sx>w||d.sy>h||(SEL&&W(d.n)<1))return;x.fillStyle="rgba(243,241,250,.85)";const tt=d.n.t.length>30?d.n.t.slice(0,29)+"…":d.n.t;x.fillText(tt,d.sx+7,d.sy+4)})}
+  if(HOV&&Z<=1.8){x.font=font(600,12.5);const tt=HOV.n.t.length>40?HOV.n.t.slice(0,39)+"…":HOV.n.t;const tw=x.measureText(tt).width;x.fillStyle="rgba(24,22,34,.88)";x.beginPath();x.roundRect?x.roundRect(HOV.sx+10,HOV.sy-24,tw+16,24,8):x.rect(HOV.sx+10,HOV.sy-24,tw+16,24);x.fill();x.fillStyle="#f3f1fa";x.fillText(tt,HOV.sx+18,HOV.sy-8)}
+  // Bereichs-Etiketten mit Führungslinien
+  DLAB=[];const labs=B.filter(([k])=>BT[k].n).map(([k,,c,[rx,ry]])=>{const[px,py]=pr(rx*1.32,ry*.95-.1,.55);return{k,c,px,py,side:px>=cx?1:-1}});
+  [-1,1].forEach(side=>{const col=labs.filter(l=>l.side===side).sort((a,b)=>a.py-b.py);let y=-1e9;col.forEach(l=>{l.ly=Math.max(l.py,y+(SM?22:38));y=l.ly});
+    const over=y-(h-24);if(over>0)col.forEach(l=>l.ly-=over);let y2=1e9;[...col].reverse().forEach(l=>{l.ly=Math.min(l.ly,y2-(SM?22:38));y2=l.ly});col.forEach(l=>{l.lx=side>0?w-6:6})});
+  const la=K<1?K*K:1;
+  labs.forEach(l=>{const{k,c,px,py,lx,ly,side}=l;const on=!selB||selB===k;x.globalAlpha=(on?1:.32)*la;x.shadowColor="rgba(11,10,16,.95)";x.shadowBlur=8;
+    x.strokeStyle=on&&selB?"rgba(255,255,255,.75)":"rgba(255,255,255,.22)";x.lineWidth=.8;x.beginPath();x.moveTo(px,py);x.lineTo(lx-side*Math.min(150,w*(SM?.08:.16)),ly);x.lineTo(lx,ly);x.stroke();
+    x.fillStyle=c;x.beginPath();x.arc(px,py,2.8,0,7);x.fill();x.strokeStyle=rgba(c,.5);x.beginPath();x.arc(px,py,6,0,7);x.stroke();
+    x.font=font(600,SM?11.5:13);x.textAlign=side>0?"right":"left";x.fillStyle="#f3f1fa";x.fillText(SM?`${BL[k]} ${BT[k].n}`:BL[k],lx,ly-7);
+    if(!SM){x.font=font(400,12);x.fillStyle="#9a96ad";const n=BT[k].n;x.fillText(k==="shops"&&SHOPS.length?(SHOPS.length===1?SHOPS[0]+" · ":SHOPS.length+" Shops · ")+`${n} ${n===1?"Notiz":"Notizen"}`:`${n} ${n===1?"Notiz":"Notizen"} · ${BT[k].lk} verknüpft`,lx,ly+12)}
+    DLAB.push({k,sx:lx-side*45,sy:ly});x.globalAlpha=1;x.shadowBlur=0});
+  // Kennzahlen hochzählen
+  if(!RM&&K<1)document.querySelectorAll("#kpis .big").forEach(el=>{el.textContent=Math.round(KP[+el.dataset.k][0]*K)});
+  else if(!RM&&!draw.done){draw.done=1;document.querySelectorAll("#kpis .big").forEach(el=>el.textContent=KP[+el.dataset.k][0])}
+}
+
+/* ===================== SUCHE ===================== */
+(function(){const i=document.getElementById("q");let tm;
+  const run=()=>{const q=norm(i.value.trim());if(q.length<2){if(SEL&&SEL.kind==="search")select(null);return}
+    const hits=new Set(NOTES.filter(n=>norm(n.t+" "+lab(n)+" "+n.d).includes(q)).map(n=>n.i));select({kind:"search",q:i.value.trim(),hits})};
+  i.addEventListener("input",()=>{clearTimeout(tm);tm=setTimeout(run,180)});
+  i.addEventListener("keydown",e=>{if(e.key==="Escape"){i.value="";select(null)}if(e.key==="Enter"&&SEL&&SEL.kind==="search"&&SEL.hits.size){select({kind:"note",i:[...SEL.hits][0]})}})})();
+
+/* ===================== NOTIZ LESEN ===================== */
+const reader=document.getElementById("reader"),rBody=document.getElementById("r-body");
+function inline(t){t=esc(t);
+  t=t.replace(/\[\[([^\]|]+?)(?:\\?\|([^\]]+))?\]\]/g,(_,a,b)=>`<button class="wl" data-wl="${a.replace(/"/g,"&quot;")}">${b||a}</button>`);
+  t=t.replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g,(_,a,u)=>`<a href="${u}" target="_blank" rel="noopener">${a}</a>`);
+  return t.replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/(^|[\s(])_([^_]+)_(?=[\s.,;:!?)]|$)/g,"$1<i>$2</i>").replace(/`([^`]+)`/g,"<code>$1</code>")}
+function md(src){src=String(src||"").replace(/^---\n[\s\S]*?\n---\n?/,"");
+  const L=src.split("\n");let h="",list=null,tbl=null,para=[];
+  const flushP=()=>{if(para.length){h+=`<p>${inline(para.join(" "))}</p>`;para=[]}};
+  const flushL=()=>{if(list){h+=`<${list.t}>${list.i.map(x=>`<li>${inline(x)}</li>`).join("")}</${list.t}>`;list=null}};
+  const flushT=()=>{if(tbl){const rows=tbl.filter(r=>!/^\s*\|?\s*:?-{2,}/.test(r)).map(r=>r.replace(/\\\|/g,"\u0001").replace(/^\s*\||\|\s*$/g,"").split("|").map(c=>c.replace(/\u0001/g,"|")));h+=`<div class="tw"><table>${rows.map((r,i)=>`<tr>${r.map(c=>i?`<td>${inline(c.trim())}</td>`:`<th>${inline(c.trim())}</th>`).join("")}</tr>`).join("")}</table></div>`;tbl=null}};
+  const flush=()=>{flushP();flushL();flushT()};
+  for(const raw of L){const l=raw.replace(/\s+$/,"");let m;
+    if(/^\s*\|.*\|\s*$/.test(l)){flushP();flushL();(tbl=tbl||[]).push(l);continue}else flushT();
+    if(!l.trim()){flushP();flushL();continue}
+    if((m=l.match(/^(#{1,4})\s+(.*)/))){flush();const n=Math.min(4,m[1].length+1);h+=`<h${n}>${inline(m[2])}</h${n}>`;continue}
+    if((m=l.match(/^\s*[-*]\s+(?:\[[ xX]\]\s+)?(.*)/))){flushP();if(!list||list.t!=="ul"){flushL();list={t:"ul",i:[]}}list.i.push(m[1]);continue}
+    if((m=l.match(/^\s*\d+[.)]\s+(.*)/))){flushP();if(!list||list.t!=="ol"){flushL();list={t:"ol",i:[]}}list.i.push(m[1]);continue}
+    if((m=l.match(/^>\s?(?:\[![^\]]+\]\s*)?(.*)/))){flush();if(m[1])h+=`<blockquote>${inline(m[1])}</blockquote>`;continue}
+    if(/^-{3,}$/.test(l)){flush();h+="<hr>";continue}
+    flushL();para.push(l.trim())}
+  flush();return h}
+function openReader(n){if(!n)return;
+  document.getElementById("r-kind").textContent=[BL[n.b],n.st].filter(Boolean).join(" · ");
+  document.getElementById("r-title").textContent=n.t;
+  const meta=[n.u&&("aktualisiert "+dt(n.u)),n.rel.size&&(n.rel.size+" Verknüpfungen")].filter(Boolean).map(esc).join(" · ");
+  rBody.innerHTML=`<div class="r-meta"><span>${meta}</span>${obs(n)?`<a href="${obs(n)}">In Obsidian öffnen ↗</a>`:""}</div><article class="md">${md(String(n.c).replace(/^#\s+(.*)\n?/,(m,a)=>norm(a)===norm(n.t)?"":m))||"<p>Leer.</p>"}</article>`;
+  rBody.scrollTop=0;reader.hidden=false;document.body.style.overflow="hidden"}
+function closeReader(){reader.hidden=true;document.body.style.overflow=""}
+reader.addEventListener("click",e=>{if(e.target===reader||e.target.closest("[data-rclose]"))closeReader();const w=e.target.closest(".wl");
+  if(w){const t=norm(w.dataset.wl.split("/").pop());const n=NOTES.find(x=>norm(x.t)===t);if(n){select({kind:"note",i:n.i});openReader(n)}else{w.classList.add("miss");w.title="Diese Notiz gibt es noch nicht"}}});
+
+/* ===================== SCHLEIFE ===================== */
+let raf=0;
+function loop(t){draw(t);if(!RM)raf=requestAnimationFrame(loop);else raf=0}
+function kick(){if(RM){cancelAnimationFrame(raf);raf=requestAnimationFrame(loop)}else if(!raf)raf=requestAnimationFrame(loop)}
+let rz;addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(kick,120)});
+if(document.fonts)document.fonts.ready.then(kick);
+kick();
+</script>
+</body>
+</html>

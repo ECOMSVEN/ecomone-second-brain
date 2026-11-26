@@ -1,0 +1,107 @@
+{
+  "collapse-filter": true,
+  "search": "-path:templates -path:_cockpit -path:archive -file:_index -file:_log -file:CLAUDE -file:_CLAUDE -file:Start",
+  "showTags": false,
+  "showAttachments": false,
+  "hideUnresolved": true,
+  "showOrphans": true,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "path:wiki/ich",
+      "color": {
+        "a": 1,
+        "rgb": 9141503
+      }
+    },
+    {
+      "query": "path:wiki/privat",
+      "color": {
+        "a": 1,
+        "rgb": 16740277
+      }
+    },
+    {
+      "query": "path:wiki/business",
+      "color": {
+        "a": 1,
+        "rgb": 5078271
+      }
+    },
+    {
+      "query": "path:wiki/shops",
+      "color": {
+        "a": 1,
+        "rgb": 2744994
+      }
+    },
+    {
+      "query": "path:wiki/projekte",
+      "color": {
+        "a": 1,
+        "rgb": 10406911
+      }
+    },
+    {
+      "query": "path:wiki/aufgaben",
+      "color": {
+        "a": 1,
+        "rgb": 16757311
+      }
+    },
+    {
+      "query": "path:wiki/personen",
+      "color": {
+        "a": 1,
+        "rgb": 16752512
+      }
+    },
+    {
+      "query": "path:wiki/themen",
+      "color": {
+        "a": 1,
+        "rgb": 4579570
+      }
+    },
+    {
+      "query": "path:wiki/entscheidungen",
+      "color": {
+        "a": 1,
+        "rgb": 16735324
+      }
+    },
+    {
+      "query": "path:wiki/synthesen",
+      "color": {
+        "a": 1,
+        "rgb": 15922427
+      }
+    },
+    {
+      "query": "path:sources",
+      "color": {
+        "a": 1,
+        "rgb": 9146531
+      }
+    },
+    {
+      "query": "path:journal",
+      "color": {
+        "a": 1,
+        "rgb": 13215743
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": false,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1.1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": true,
+  "centerStrength": 0.5,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 1,
+  "close": true
+}

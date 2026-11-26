@@ -1,0 +1,8 @@
+/* Ruhiges Cockpit für Start.md (cssclasses: cockpit) */
+.cockpit .markdown-preview-sizer { line-height: 1.65; }
+.cockpit h1 { font-size: 2.4em; letter-spacing: -0.03em; margin-bottom: 0.6em; }
+.cockpit h2 { margin-top: 1.6em; font-size: 1.2em; }
+.cockpit .callout { border-radius: 16px; padding: 14px 18px; }
+.callout[data-callout="schnellzugriff"] { --callout-color: 167, 139, 250; --callout-icon: lucide-zap; }
+.callout[data-callout="ablauf"] { --callout-color: 52, 211, 153; --callout-icon: lucide-workflow; }
+.cockpit .callout[data-callout="schnellzugriff"] ul { columns: 2; }

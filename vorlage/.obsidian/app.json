@@ -1,0 +1,10 @@
+{
+  "newFileLocation": "folder",
+  "newFileFolderPath": "inbox",
+  "attachmentFolderPath": "sources/assets",
+  "alwaysUpdateLinks": true,
+  "defaultViewMode": "preview",
+  "userIgnoreFilters": [
+    ".brain/"
+  ]
+}
