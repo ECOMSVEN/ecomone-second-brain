@@ -11,6 +11,7 @@ Du musst hier nichts von Hand tun. Den Masterprompt aus dem Kurs in Claude (Desk
 # danach die persönlichen Seiten schreiben (siehe Masterprompt, Schritt 4)
 <PY> "<Brain>/.brain/ansicht.py"     # Index + 3D-Ansicht «Mein Brain.html»
 <PY> "<Brain>/.brain/pruefen.py"     # bis «ALLES OK»
+<PY> einrichten.py werkzeuge                     # Plugins + stop-slop, aktiv ab dem nächsten neuen Chat
 <PY> einrichten.py obsidian --brain "<Brain>"   # Obsidian vorher beenden
 ```
 
@@ -27,6 +28,18 @@ Du musst hier nichts von Hand tun. Den Masterprompt aus dem Kurs in Claude (Desk
 | `vorlage/.brain/index.py` | erzeugt `_index.md` |
 | `vorlage/.brain/pruefen.py` | prüft das Brain, meldet ✓/✗ |
 | `skills/` | 9 Claude-Befehle: brain-merken, brain-ingest, brain-frage, brain-aufgabe, brain-person, brain-adtest, brain-tagebuch, brain-pruefen, brain-ansicht |
+
+## Werkzeuge, die mitinstalliert werden
+
+| Werkzeug | Quelle | Wofür |
+|---|---|---|
+| Obsidian-Skills | obsidianmd/obsidian-skills | Claude schreibt sauberes Obsidian (Markdown, Bases, Canvas) |
+| UI/UX Pro Max | nextlevelbuilder/ui-ux-pro-max-skill | Design: Shop-Seiten, Banner, Farben, Schriften |
+| claude-mem | thedotmack/claude-mem | Gedächtnis über alle Chats (braucht Node.js 20+) |
+| HyperFrames | heygen-com/hyperframes | Videos und Animationen aus Code, z. B. für Ads |
+| stop-slop | hardikpandya/stop-slop | Texte ohne typische KI-Floskeln |
+
+Alle Open Source (MIT bzw. Apache-2.0). Mit dem Befehl `claude` werden sie direkt installiert, sonst in `~/.claude/settings.json` angemeldet; Claude Code lädt sie beim nächsten neuen Chat.
 
 ## Struktur des Brains
 

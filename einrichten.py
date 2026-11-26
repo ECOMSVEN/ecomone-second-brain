@@ -160,6 +160,69 @@ def brain(a):
     print("SHOPS=" + "; ".join(shops))
 
 
+PLUGINS = [("obsidianmd/obsidian-skills", "obsidian-skills", "obsidian"),
+           ("nextlevelbuilder/ui-ux-pro-max-skill", "ui-ux-pro-max-skill", "ui-ux-pro-max"),
+           ("thedotmack/claude-mem", "thedotmack", "claude-mem"),
+           ("heygen-com/hyperframes", "hyperframes", "hyperframes")]
+SKILLS = [("hardikpandya/stop-slop", "stop-slop")]
+
+
+def werkzeuge(a):
+    """Installiert die Claude-Erweiterungen, die auch die Ecomone Academy nutzt. Wirksam ab dem nächsten neuen Chat."""
+    import subprocess
+    import tempfile
+    import urllib.request
+    import zipfile
+    claude = shutil.which("claude")
+    if claude:
+        for repo, markt, plugin in PLUGINS:
+            r1 = subprocess.run([claude, "plugin", "marketplace", "add", repo], capture_output=True, text=True)
+            r2 = subprocess.run([claude, "plugin", "install", f"{plugin}@{markt}", "--scope", "user"], capture_output=True, text=True)
+            if r2.returncode == 0:
+                ok(f"Plugin {plugin} installiert")
+            else:
+                warn(f"Plugin {plugin}: {(r2.stderr or r2.stdout or r1.stderr).strip()[:160]}")
+    else:
+        # Ohne CLI: in den Benutzer-Einstellungen anmelden; Claude Code lädt sie beim nächsten Start selbst.
+        p = os.path.join(HOME, ".claude", "settings.json")
+        daten = {}
+        if os.path.exists(p):
+            shutil.copy2(p, p + ".sicherung")
+            try:
+                daten = json.load(open(p, encoding="utf-8"))
+            except ValueError:
+                print(f"STOP {p} ist kein gültiges JSON, nichts geändert.")
+                sys.exit(4)
+        mk = daten.setdefault("extraKnownMarketplaces", {})
+        ep = daten.setdefault("enabledPlugins", {})
+        for repo, markt, plugin in PLUGINS:
+            mk.setdefault(markt, {"source": {"source": "github", "repo": repo}})
+            ep.setdefault(f"{plugin}@{markt}", True)
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        with open(p, "w", encoding="utf-8") as fh:
+            json.dump(daten, fh, ensure_ascii=False, indent=2)
+        ok("Plugins in .claude/settings.json angemeldet (laden beim nächsten neuen Chat): " + ", ".join(x[2] for x in PLUGINS))
+    for repo, name in SKILLS:
+        ziel = os.path.join(HOME, ".claude", "skills", name)
+        if os.path.exists(os.path.join(ziel, "SKILL.md")):
+            ok(f"Skill {name} schon da")
+            continue
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                zp = os.path.join(tmp, "s.zip")
+                urllib.request.urlretrieve(f"https://codeload.github.com/{repo}/zip/refs/heads/main", zp)
+                with zipfile.ZipFile(zp) as z:
+                    z.extractall(tmp)
+                quelle = next(os.path.join(tmp, d) for d in os.listdir(tmp) if os.path.isdir(os.path.join(tmp, d)))
+                shutil.copytree(quelle, ziel, ignore=shutil.ignore_patterns(".git*", ".github"))
+            ok(f"Skill {name} installiert")
+        except Exception as e:  # noqa: BLE001
+            warn(f"Skill {name} nicht installiert ({e.__class__.__name__}): von github.com/{repo} nach {ziel} kopieren")
+    node = shutil.which("node")
+    v = subprocess.run([node, "--version"], capture_output=True, text=True).stdout.strip() if node else ""
+    print("NODE=" + (v or "fehlt"))
+
+
 def obsidian_json():
     if WIN:
         return os.path.join(os.environ.get("APPDATA", os.path.join(HOME, "AppData", "Roaming")), "obsidian", "obsidian.json")
@@ -207,12 +270,13 @@ def main():
     b.add_argument("--ziel")
     b.add_argument("--ergaenzen", action="store_true")
     b.add_argument("--skills-ersetzen", action="store_true")
+    sub.add_parser("werkzeuge")
     o = sub.add_parser("obsidian")
     o.add_argument("--brain", required=True)
     a = ap.parse_args()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    brain(a) if a.cmd == "brain" else obsidian(a)
+    {"brain": brain, "werkzeuge": werkzeuge, "obsidian": obsidian}[a.cmd](a)
 
 
 if __name__ == "__main__":

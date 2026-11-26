@@ -138,6 +138,16 @@ for n in namen_sk:
         fehlt.append(n)
 punkt(not fehlt, "9 Befehle installiert, Frontmatter gültig", fehlt)
 
+try:
+    st = json.load(open(os.path.join(HOME, ".claude", "settings.json"), encoding="utf-8"))
+except (OSError, ValueError):
+    st = {}
+soll = ["obsidian@obsidian-skills", "ui-ux-pro-max@ui-ux-pro-max-skill", "claude-mem@thedotmack", "hyperframes@hyperframes"]
+fehlt = [x for x in soll if not (st.get("enabledPlugins") or {}).get(x)]
+if not os.path.isfile(os.path.join(sk, "stop-slop", "SKILL.md")):
+    fehlt.append("stop-slop")
+punkt(not fehlt, "Academy-Werkzeuge angemeldet (Obsidian-Skills, UI/UX Pro Max, claude-mem, HyperFrames, stop-slop)", fehlt)
+
 cm = os.path.join(HOME, ".claude", "CLAUDE.md")
 t = open(cm, encoding="utf-8").read() if os.path.exists(cm) else ""
 punkt(t.count("<!-- second-brain:start -->") == 1 and t.count("<!-- second-brain:end -->") == 1, "Gedächtnis-Block genau einmal in .claude/CLAUDE.md")
