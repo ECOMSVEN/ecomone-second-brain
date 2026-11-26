@@ -41,6 +41,16 @@ Du musst hier nichts von Hand tun. Den Masterprompt aus dem Kurs in Claude (Desk
 
 Alle Open Source (MIT bzw. Apache-2.0). Mit dem Befehl `claude` werden sie direkt installiert, sonst in `~/.claude/settings.json` angemeldet; Claude Code lädt sie beim nächsten neuen Chat.
 
+## Logo-Werkzeug (`logo/logo.py`)
+
+Schlichte Wortmarke aus dem Shopnamen in Poppins, immer schwarz (Ecomone Academy, Lektion 8.4). Braucht `fonttools` und `pillow`.
+
+```
+<python> logo/logo.py --name "Glowbox"            # → ~/Ecomone Logos/Glowbox
+```
+
+Erzeugt je Strichstärke (Medium, SemiBold, Bold): Logo quer transparent (schwarz und weiss), Profilbild 1080 × 1080 für Facebook/Instagram, Favicon (Anfangsbuchstabe und Name), jeweils SVG und PNG, dazu `vorschau.html` und den Ordner «Fertig» mit klaren Dateinamen. Die Buchstaben werden in Formen umgewandelt, die SVGs brauchen keine installierte Schrift. Poppins: SIL Open Font License.
+
 ## Struktur des Brains
 
 `wiki/ich` · `wiki/privat` · `wiki/business` · `wiki/shops/<Shop>/{produkte,ads,lieferanten}` · `wiki/projekte` · `wiki/aufgaben` · `wiki/personen` · `wiki/themen` · `wiki/entscheidungen` · `wiki/synthesen` · `sources/` (unveränderlich) · `journal/` · `inbox/` · `archive/`

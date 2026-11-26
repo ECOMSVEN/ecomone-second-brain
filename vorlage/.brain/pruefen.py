@@ -58,6 +58,10 @@ punkt(not fehlt, "Grunddateien vorhanden", fehlt)
 
 alle = md_dateien()
 namen = {os.path.splitext(os.path.basename(p))[0].lower() for p in alle}
+dateien_alle = set()
+for _r, _d, _f in os.walk(BRAIN):
+    _d[:] = [x for x in _d if not x.startswith(".")]
+    dateien_alle.update(nfc(x).lower() for x in _f)
 pfade = {os.path.splitext(p)[0].lower() for p in alle}
 wiki = [p for p in alle if p.startswith("wiki/") and p.endswith(".md")]
 
@@ -94,6 +98,10 @@ for p in alle:
     for roh in LINK.findall(t):
         z = nfc(roh.replace("\\|", "|").split("|")[0].split("#")[0].strip())
         if not z:
+            continue
+        if re.search(r"\.(png|jpe?g|gif|svg|webp|pdf|mp4|mp3|m4a|html)$", z, re.I):
+            if os.path.basename(z).lower() not in dateien_alle:
+                kaputt.append(f"{p} → [[{roh}]]")
             continue
         k = z[:-3] if z.lower().endswith(".md") else z
         k_base = k[:-5] if k.lower().endswith(".base") else k
